@@ -1,0 +1,113 @@
+{
+  "model_target": "gemini-2.5-flash-image (Nano Banana)",
+  "task": "image_generation_from_elevation",
+  "input_reference": "2D architectural elevation drawing of a built-in media wall with central TV, upper open shelving grid, and lower shaker cabinets",
+  "output_goal": "Photorealistic 3D rendering that faithfully matches the proportions, layout, and millwork of the reference elevation",
+  "prompt": "Create a photorealistic, interior-design-quality 3D rendering of the built-in media wall shown in the attached elevation drawing. Preserve the exact layout, proportions, and compartment counts from the drawing. The final rendered image must NOT contain any dimension lines, measurement annotations, inch marks, leader lines, arrows, or drafting labels — it should look like a finished interior photograph. Render as a finished, furnished room view, camera roughly eye-level, straight-on to slightly angled (5-10 degrees) to show depth, with soft natural daylight from the left and warm fill lighting from the room.",
+  "subject": {
+    "type": "floor-to-ceiling built-in media / entertainment wall unit",
+    "style": "transitional modern with classical shaker detailing",
+    "overall_layout_top_to_bottom": [
+      {
+        "zone": "header / valance",
+        "description": "Flat horizontal frieze band spanning the full width at the top, with a small rectangular inset panel in the upper-left containing an X marker (represent as a discreet integrated ventilation / speaker grille panel, subtly recessed, matching cabinet finish)"
+      },
+      {
+        "zone": "upper open shelving grid",
+        "description": "Four-column-wide open shelving grid flanking and surrounding a central wall-mounted TV",
+        "grid": {
+          "columns": 4,
+          "rows": 4,
+          "row_heights_top_to_bottom": ["tall/square", "short/rectangular", "medium", "medium"],
+          "tv_placement": "centered, spans the inner two columns across the bottom two rows of the upper grid, leaving the outer columns as tall two-row open cubbies on each side",
+          "shelf_construction": "thin flat shelves with mitered front edges, recessed into a face-frame grid; back panels painted to match case",
+          "styling": "sparsely styled with books laid flat and upright, small ceramic vessels, a brass sculpture, a framed art print, a trailing pothos plant, and a pair of stacked linen-bound boxes — leave roughly 40% of cubbies empty for breathing room"
+        }
+      },
+      {
+        "zone": "television",
+        "description": "50-inch LG QNED flat-panel TV, wall-mounted flush within the central opening, bezel-less, screen off (dark) or showing a neutral abstract cloudscape identical to the reference; centered horizontally; opening height about 38 inches as dimensioned"
+      },
+      {
+        "zone": "counter / transition rail",
+        "description": "Slim horizontal rail / countertop element separating the upper open shelving from the lower base cabinets, same finish as casework"
+      },
+      {
+        "zone": "lower base cabinets",
+        "description": "Row of six shaker-style cabinet doors across the full width, equal widths, classic inset shaker profile with a single recessed flat panel and a narrow reveal between doors; minimal low-profile brushed brass or matte black knob hardware centered on the upper rail of each door"
+      },
+      {
+        "zone": "base / plinth",
+        "description": "Clean recessed toe-kick with a simple flat baseboard plinth beneath the lower cabinets, matching the casework color"
+      }
+    ]
+  },
+  "dimensions_from_drawing": {
+    "tv_width_inches": 50,
+    "tv_opening_height_inches": 38,
+    "use_these_as_anchor": "Scale every other element proportionally from the 50\" TV width and 38\" opening height shown in the drawing"
+  },
+  "materials_and_finish": {
+    "casework": "painted MDF in warm off-white (Benjamin Moore White Dove / Simply White equivalent), matte finish, crisp reveals",
+    "shelves": "same paint as casework",
+    "interior_backs_of_open_cubbies": "same paint, or optional very subtle warm taupe for depth",
+    "hardware": "small round brushed-brass knobs on lower cabinet doors",
+    "tv_bezel": "thin black",
+    "wall_behind_unit": "flush with casework; not visible",
+    "floor": "wide-plank white oak hardwood, matte finish, natural tone",
+    "ceiling": "flat white with a simple shadow-line reveal"
+  },
+  "lighting": {
+    "key_light": "soft diffused daylight from the left, as if from an off-camera window",
+    "fill_light": "warm 2700K interior ambient",
+    "accent": "subtle integrated LED strip lighting under each open shelf, gently grazing the back panels",
+    "tv_state": "screen showing the same LG QNED cloudscape image as the reference, slightly glowing",
+    "exposure": "balanced, no blown highlights; gentle contrast"
+  },
+  "camera": {
+    "framing": "full built-in visible with a small margin of room on either side and the floor in the foreground",
+    "focal_length_mm": 35,
+    "angle": "straight-on elevation view with a 5-10 degree rotation to reveal the thickness of the case and slight depth of shelves",
+    "height": "eye-level, around 60 inches off the floor",
+    "aspect_ratio": "4:5 or 1:1 portrait-leaning for the full wall"
+  },
+  "style_and_mood": {
+    "aesthetic": "architectural digest, warm minimalist, editorial interior photography",
+    "render_quality": "photorealistic, crisp edges, accurate shadows, no CGI plasticiness",
+    "color_palette": "warm neutrals, soft whites, natural oak, muted brass, a few greenery accents"
+  },
+  "faithfulness_rules": [
+    "Preserve the exact proportions, compartment sizes, and spacing shown in the elevation — use the 50\" TV width and 38\" opening height only as internal scale references, never draw them.",
+    "Keep the exact compartment count: 4 columns in the upper shelving grid, 6 doors in the lower cabinet bank.",
+    "Keep the TV centered and sized relative to surrounding cubbies exactly as drawn.",
+    "Preserve the header band at the top with the single offset inset panel on the left side.",
+    "Do not add crown molding, fluted details, or fireplace elements that are not in the drawing.",
+    "Do not change the door style from shaker to raised-panel or slab.",
+    "Do not add glass doors to the upper cubbies — they remain open shelving.",
+    "CRITICAL: The final rendered image must contain no dimension labels, no '38\"' or '50\"' text, no leader/arrow lines, no tick marks, and no drafting annotations of any kind. Render only the finished, real-world built-in as it would appear in a photograph."
+  ],
+  "negative_prompt": "no fisheye distortion, no warped proportions, no extra cabinets, no fireplace, no crown molding, no glass doors on shelves, no clutter, no text or watermarks, no cartoon or illustrative style, no people, no pets, NO dimension lines, NO measurement annotations, NO inch marks, NO '38\"' or '50\"' labels, NO leader lines, NO arrows, NO drafting tick marks, NO construction guides — the final output must look like a finished photograph with zero drafting overlay",
+  "api_call_example": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
+    "contents": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "inline_data": {
+              "mime_type": "image/png",
+              "data": "<BASE64_ENCODED_ELEVATION_IMAGE>"
+            }
+          },
+          {
+            "text": "Using the attached 2D elevation drawing as the authoritative layout reference, generate a photorealistic 3D interior rendering of this built-in media wall. PRESERVE ALL PROPORTIONS EXACTLY as drawn (use the 50\" TV width and 38\" opening height only as internal scale references — do NOT include any dimension lines, measurement labels, leader lines, arrows, tick marks, or '38\"'/'50\"' text in the output). Match the exact compartment counts: 4-column upper open shelving grid surrounding a centered LG QNED TV, and 6 shaker-style lower cabinet doors. Finish: warm off-white painted casework, white oak floor, brushed brass knobs, soft daylight from the left, editorial interior photography quality. Preserve the header band with the small offset inset panel in the upper left, and do not add crown molding, glass doors, or fireplace elements. Style the open cubbies lightly with books, ceramics, and a trailing plant; leave about 40% of cubbies empty. 35mm lens, eye-level, 5-10 degree angle to show depth. Output must look like a finished interior photograph with zero drafting overlay."
+          }
+        ]
+      }
+    ],
+    "generation_config": {
+      "temperature": 0.4,
+      "response_modalities": ["IMAGE"]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "python3",
+      "args": ["$HOME/repos/agent-web/spine/mcp/server.py"],
+      "env": {
+        "MEM0_HOST": "http://localhost:8888",
+        "MEM0_API_KEY": "<key from http://localhost:3000 wizard>",
+        "MEMORY_USER_ID": "sean"
+      }
+    }
+  }
+}

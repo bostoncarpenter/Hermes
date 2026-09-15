@@ -1,0 +1,9 @@
+# Merge into ~/.codex/config.toml — Codex CLI on the same memory spine.
+[mcp_servers.memory]
+command = "python3"
+args = ["/Users/SEAN/repos/agent-web/spine/mcp/server.py"]
+
+[mcp_servers.memory.env]
+MEM0_HOST = "http://localhost:8888"
+MEM0_API_KEY = "<key from http://localhost:3000 wizard>"
+MEMORY_USER_ID = "sean"

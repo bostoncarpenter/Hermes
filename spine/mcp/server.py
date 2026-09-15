@@ -43,7 +43,7 @@ def remember(text: str) -> str:
 @mcp.tool()
 def recall(query: str, limit: int = 10) -> str:
     """Search shared long-term memory for facts relevant to the query."""
-    r = _req("POST", "/search", {"query": query, "user_id": USER_ID, "limit": limit})
+    r = _req("POST", "/search", {"query": query, "user_id": USER_ID, "top_k": limit})
     return json.dumps(r)
 
 

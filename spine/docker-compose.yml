@@ -20,8 +20,12 @@ services:
       - "127.0.0.1:8432:5432"
     networks: [spine]
 
+  # Published images are stale — build API + dashboard from the same pinned
+  # upstream commit. Bump MEM0_REF in .env to upgrade.
   mem0:
-    image: mem0/mem0-api-server:latest
+    build:
+      context: "https://github.com/mem0ai/mem0.git#${MEM0_REF:?Set MEM0_REF in .env}:server"
+    command: sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
     restart: unless-stopped
     ports:
       - "127.0.0.1:8888:8000"
@@ -45,10 +49,9 @@ services:
         condition: service_healthy
     networks: [spine]
 
-  # No published image — built from source on first `docker compose up`.
   mem0-dashboard:
     build:
-      context: "https://github.com/mem0ai/mem0.git#main:server/dashboard"
+      context: "https://github.com/mem0ai/mem0.git#${MEM0_REF}:server/dashboard"
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"

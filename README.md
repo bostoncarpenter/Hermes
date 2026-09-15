@@ -51,10 +51,13 @@ orchestrates every AI subscription on top of a shared mem0 memory spine.
 ```bash
 git clone <this repo> ~/repos/agent-web && cd ~/repos/agent-web
 bash scripts/setup-mac.sh          # brew, docker (OrbStack), hermes, configs, docker compose up
-                                   # (first `up` builds the mem0 dashboard — a few minutes)
+                                   # (first `up` builds mem0 API + dashboard from source — a few minutes)
 # then, as prompted:
 open http://localhost:3000         # mem0 wizard → API key → spine/.env + ~/.hermes/.env
 bash scripts/configure-mem0.sh     # switch mem0 LLM+embedder to Gemini (default is OpenAI)
+# smoke test:
+curl -s -H "X-API-Key: $MEM0_API_KEY" -X POST localhost:8888/search \
+  -H 'content-type: application/json' -d '{"query":"test","user_id":"sean"}'
 hermes auth add openai-codex
 hermes auth add xai-oauth
 hermes model                       # Nous Portal default
@@ -83,8 +86,8 @@ is not wired into the memory API.
 ## Layout
 
 ```
-spine/            docker-compose (postgres/pgvector, mem0 api, dashboard*, open-webui)
-                  *dashboard is built from source on first up — no published image
+spine/            docker-compose (postgres/pgvector, mem0 api*, dashboard*, open-webui)
+                  *mem0 api + dashboard build from pinned upstream SHA (MEM0_REF in spine/.env)
 spine/mcp/        stdio MCP memory bridge (FastMCP)
 hermes/           config.yaml + env.example → copied to ~/.hermes/
 clients/          drop-in MCP snippets for claude-code, codex, gemini-cli

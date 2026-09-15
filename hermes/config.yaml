@@ -9,8 +9,7 @@ fallback_providers:
     model: gpt-5-codex
   - provider: xai-oauth      # SuperGrok subscription
     model: grok-4
-  - provider: gemini         # GEMINI_API_KEY
-    model: gemini-2.5-pro
+  # No gemini entry: Gemini models are served through Nous Portal already.
 
 memory:
   provider: mem0   # self-hosted: MEM0_HOST + MEM0_API_KEY come from ~/.hermes/.env

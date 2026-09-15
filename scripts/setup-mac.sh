@@ -18,6 +18,21 @@ if ! docker info >/dev/null 2>&1; then
   until docker info >/dev/null 2>&1; do sleep 2; done
 fi
 
+if [ ! -f "$ROOT/spine/.env" ]; then
+  cp "$ROOT/spine/.env.example" "$ROOT/spine/.env"
+  sed -i '' "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 32)/" "$ROOT/spine/.env"
+  sed -i '' "s/^JWT_SECRET=.*/JWT_SECRET=$(openssl rand -hex 32)/" "$ROOT/spine/.env"
+  echo "==> generated POSTGRES_PASSWORD + JWT_SECRET in spine/.env"
+fi
+
+echo "==> Ollama (native — memory extraction runs locally on Metal)"
+command -v ollama >/dev/null || brew install ollama
+brew services start ollama
+until curl -sf http://localhost:11434/api/version >/dev/null; do sleep 1; done
+set -a; . "$ROOT/spine/.env" 2>/dev/null || true; set +a
+ollama pull "${OLLAMA_LLM_MODEL:-qwen2.5:7b}"
+ollama pull "${OLLAMA_EMBED_MODEL:-nomic-embed-text}"
+
 echo "==> Hermes Agent"
 command -v hermes >/dev/null || curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 
@@ -32,22 +47,16 @@ backup_copy() { # src dst
 }
 backup_copy "$ROOT/hermes/config.yaml" "$HERMES_DIR/config.yaml"
 [ -f "$HERMES_DIR/.env" ] || cp "$ROOT/hermes/env.example" "$HERMES_DIR/.env"
-if [ ! -f "$ROOT/spine/.env" ]; then
-  cp "$ROOT/spine/.env.example" "$ROOT/spine/.env"
-  sed -i '' "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 32)/" "$ROOT/spine/.env"
-  sed -i '' "s/^JWT_SECRET=.*/JWT_SECRET=$(openssl rand -hex 32)/" "$ROOT/spine/.env"
-  echo "    generated POSTGRES_PASSWORD + JWT_SECRET in spine/.env"
-fi
 
 echo "==> Spine stack"
 docker compose -f "$ROOT/spine/docker-compose.yml" --env-file "$ROOT/spine/.env" up -d || \
-  echo "!! fill in spine/.env first (GOOGLE_API_KEY)"
+  echo "!! fill in spine/.env first"
 
 cat <<'EOF'
 
 Done. Next steps:
-  1. Fill in spine/.env (GOOGLE_API_KEY; passwords were auto-generated),
-     then re-run this script if the stack didn't come up.
+  1. spine/.env is fully pre-filled (secrets generated, Ollama defaults).
+     On an 8GB mini set OLLAMA_LLM_MODEL=qwen2.5:3b and re-run the pulls.
   2. Open http://localhost:3000 → run the wizard → copy the API key into
      spine/.env (MEM0_API_KEY) and ~/.hermes/.env (MEM0_API_KEY).
   2b. Smoke test: curl -s -H "X-API-Key: $MEM0_API_KEY" -X POST \
@@ -57,8 +66,7 @@ Done. Next steps:
        hermes auth add openai-codex   # ChatGPT
        hermes auth add xai-oauth      # SuperGrok
        hermes model                   # pick Nous Portal as default
-     Add GEMINI_API_KEY to ~/.hermes/.env.
-  3b. Switch mem0 to Gemini (default is OpenAI):
+  3b. Point mem0 at local Ollama:
        bash scripts/configure-mem0.sh
   4. Telegram: hermes gateway setup, then scripts/install-launchd.sh
      (or simply `hermes gateway install` — Hermes can self-install on launchd).

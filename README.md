@@ -11,7 +11,6 @@ orchestrates every AI subscription on top of a shared mem0 memory spine.
                 │   Hermes Agent (orchestrator, launchd) │
                 │   default: Nous Portal                 │
                 │   fallback: openai-codex → xai-oauth   │
-                │             → gemini                   │
                 └───────────────┬───────────────────────┘
                                 │ MCP (stdio)
         ┌───────────────┬───────┴────────┬──────────────┐
@@ -24,6 +23,9 @@ orchestrates every AI subscription on top of a shared mem0 memory spine.
                                 │ X-API-Key
                                 ▼
    docker: mem0 api :8888 ── postgres+pgvector ── dashboard :3000 ── open-webui :8080
+                        │
+                        ▼  OpenAI-compatible /v1 (host.docker.internal)
+              native Ollama :11434  (Metal GPU — extraction never leaves the Mac)
 ```
 
 ## What each subscription can / can't do
@@ -33,7 +35,7 @@ orchestrates every AI subscription on top of a shared mem0 memory spine.
 | Nous Portal | default provider `nous` via `hermes model` | also bundles tools (TTS, web) |
 | ChatGPT | provider `openai-codex`, `hermes auth add openai-codex` | first fallback |
 | SuperGrok | provider `xai-oauth`, `hermes auth add xai-oauth` | second fallback |
-| Gemini | provider `gemini`, `GEMINI_API_KEY` in `~/.hermes/.env` | third fallback; free AI Studio key also powers mem0 |
+| Gemini | via Nous Portal models, or the Gemini CLI client | no API key needed by Hermes |
 | Claude Pro | **not usable by Hermes** (needs Max + extra credits) | reached via Claude Code CLI, which joins the spine via `spine/mcp` |
 
 ## What each subscription pays for
@@ -43,7 +45,7 @@ orchestrates every AI subscription on top of a shared mem0 memory spine.
 | Nous Portal | Covers the default model; also bundles tool providers (TTS, web). |
 | ChatGPT → openai-codex | OAuth login; Hermes does not document quota semantics — expect ChatGPT plan limits. |
 | SuperGrok → xai-oauth | Uses subscription quota. |
-| Gemini API key | Free AI Studio tier is fine for memory extraction (mem0 LLM + embeddings); too small for long agent runs — keep it as last fallback. |
+| Memory extraction | Local Ollama (qwen2.5 + nomic-embed-text) — free, no memory content leaves the Mac. |
 | Claude Pro | Not usable in Hermes (needs Max + extra usage credits) — Claude Code CLI only. |
 
 ## Quickstart (≈10 min, macOS)
@@ -54,7 +56,7 @@ bash scripts/setup-mac.sh          # brew, docker (OrbStack), hermes, configs, d
                                    # (first `up` builds mem0 API + dashboard from source — a few minutes)
 # then, as prompted:
 open http://localhost:3000         # mem0 wizard → API key → spine/.env + ~/.hermes/.env
-bash scripts/configure-mem0.sh     # switch mem0 LLM+embedder to Gemini (default is OpenAI)
+bash scripts/configure-mem0.sh     # point mem0 at local Ollama (llm+embedder)
 # smoke test:
 curl -s -H "X-API-Key: $MEM0_API_KEY" -X POST localhost:8888/search \
   -H 'content-type: application/json' -d '{"query":"test","user_id":"sean"}'
@@ -79,8 +81,10 @@ mem0 REST API (`/memories`, `/search`, `X-API-Key`) on `localhost:8888` with one
 Telegram. Hermes additionally sets `memory.provider: mem0` (self-hosted via
 `MEM0_HOST`/`MEM0_API_KEY`) for its native memory.
 
-Browse the memory log in the mem0 dashboard at :3000. Open WebUI (:8080) is an
-optional desktop chat view pointed at Gemini's OpenAI-compatible endpoint — it
+Memory extraction runs locally on Ollama — no memory content leaves the Mac.
+`qwen2.5:7b` wants ~8GB free RAM; on an 8GB mini set `OLLAMA_LLM_MODEL=qwen2.5:3b`
+in `spine/.env`. Browse the memory log in the mem0 dashboard at :3000. Open
+WebUI (:8080) is an optional desktop chat view over the same local Ollama — it
 is not wired into the memory API.
 
 ## Layout

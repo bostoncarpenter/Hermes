@@ -1,4 +1,5 @@
 {
+  "_note": "Gemini CLI signs in with your Google account; nothing from the memory spine is routed through Google.",
   "mcpServers": {
     "memory": {
       "command": "python3",

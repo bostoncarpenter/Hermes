@@ -71,4 +71,7 @@ Done. Next steps:
   4. Telegram: hermes gateway setup, then scripts/install-launchd.sh
      (or simply `hermes gateway install` — Hermes can self-install on launchd).
   5. Wire Claude Code / Codex / Gemini CLI via clients/ snippets.
+  6. Optional: ingest Gmail/Calendar/Drive into the spine —
+     see README "Ingesting your Google data", then
+     bash scripts/install-google-ingest.sh
 EOF

@@ -4,6 +4,9 @@ Deployable kit for a 24/7 Mac mini: [Hermes Agent](https://hermes-agent.nousrese
 orchestrates every AI subscription on top of a shared mem0 memory spine.
 
 ```
+  Google (Gmail/Drive/Calendar)
+             │ remote MCP + OAuth
+             ▼
                  Telegram (phone)          Terminal / SSH
                         │                        │
                         ▼                        ▼
@@ -66,6 +69,31 @@ hermes model                       # Nous Portal default
 hermes gateway setup               # Telegram
 bash scripts/install-launchd.sh    # or: hermes gateway install
 ```
+
+## Ingesting your Google data
+
+A 6-hourly cron job pulls new Gmail / Calendar / Drive content into the memory
+spine via Google's official remote MCP servers.
+
+1. Create a free Google Cloud project (no billing): `gcloud projects create`
+2. Enable the APIs:
+   ```bash
+   gcloud services enable gmail.googleapis.com drive.googleapis.com calendar-json.googleapis.com gmailmcp.googleapis.com drivemcp.googleapis.com calendarmcp.googleapis.com people.googleapis.com --project=PROJECT_ID
+   ```
+3. Create an OAuth client (type **Desktop app**) in the project's credentials page.
+4. Put the client id/secret in `~/.hermes/.env` (`GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`).
+5. From a fresh terminal (not a running session):
+   ```bash
+   hermes mcp login gmail && hermes mcp login gdrive && hermes mcp login gcalendar
+   ```
+6. Install the scheduled job:
+   ```bash
+   bash scripts/install-google-ingest.sh   # every 6h, --continuity, summary → Telegram
+   ```
+
+Privacy: data flows Google → Mac → local Ollama extraction → mem0 on the same
+Mac. Nothing is sent back out — the only read path off the machine is you
+asking via Telegram.
 
 ## Mobile usage
 

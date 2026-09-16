@@ -15,6 +15,30 @@ memory:
   provider: mem0   # self-hosted: MEM0_HOST + MEM0_API_KEY come from ~/.hermes/.env
 
 mcp_servers:
+  # Google remote MCP servers — ingest Gmail/Drive/Calendar into the spine.
+  # No dynamic client registration: OAuth Desktop client id/secret required
+  # (in ~/.hermes/.env), then `hermes mcp login <name>` per server.
+  gmail:
+    enabled: true
+    url: "https://gmailmcp.googleapis.com/mcp/v1"
+    auth: oauth
+    oauth:
+      client_id: "${GOOGLE_OAUTH_CLIENT_ID}"
+      client_secret: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+  gdrive:
+    enabled: true
+    url: "https://drivemcp.googleapis.com/mcp/v1"
+    auth: oauth
+    oauth:
+      client_id: "${GOOGLE_OAUTH_CLIENT_ID}"
+      client_secret: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+  gcalendar:
+    enabled: true
+    url: "https://calendarmcp.googleapis.com/mcp/v1"
+    auth: oauth
+    oauth:
+      client_id: "${GOOGLE_OAUTH_CLIENT_ID}"
+      client_secret: "${GOOGLE_OAUTH_CLIENT_SECRET}"
   memory:
     command: python3
     args: ["${HOME}/repos/agent-web/spine/mcp/server.py"]
